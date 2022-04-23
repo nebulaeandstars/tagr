@@ -1,0 +1,10 @@
+[package]
+name = "tagr"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+  [dependencies.clap]
+  version = "3.1"
+  features = ["clap_derive"]
