@@ -1,7 +1,12 @@
 [package]
 name = "tagr"
-version = "0.1.0"
+version = "0.1.1"
+authors = ["Laura Powles <laura@laurapowles.com>"]
 edition = "2021"
+
+license-file = "LICENSE"
+description = "A simple, UNIX-friendly tag manager"
+repository = "https://github.com/nebulaeandstars/tagr"
 
 [dependencies]
 dirs = "4.0"
