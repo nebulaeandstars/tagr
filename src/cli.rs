@@ -17,7 +17,7 @@ pub struct Cli {
 #[derive(Subcommand)]
 pub enum Command {
     /// Tag a set of files
-    Tag {
+    Add {
         /// Tag to add the files to
         tag: Tag,
 
@@ -26,7 +26,7 @@ pub enum Command {
     },
 
     /// Untag a set of files
-    Untag {
+    Rm {
         /// Tag to add the files to
         tag: Tag,
 
