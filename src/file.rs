@@ -5,6 +5,7 @@ use std::{fmt, hash};
 
 use crate::crash;
 
+#[derive(Clone)]
 pub struct File {
     path: PathBuf,
 }

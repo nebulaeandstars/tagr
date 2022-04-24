@@ -8,14 +8,12 @@ use tag::Tag;
 
 fn tag_files(tag: Tag, files: Vec<File>) {
     for file in files {
-        println!("adding to {}: {}", tag.name, file);
         tag.add(file);
     }
 }
 
 fn untag_files(tag: Tag, files: Vec<File>) {
     for file in files {
-        println!("removing from {}: {}", tag.name, file);
         tag.remove(file);
     }
 }

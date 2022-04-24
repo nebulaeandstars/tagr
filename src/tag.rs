@@ -1,12 +1,15 @@
 use std::collections::HashSet;
 use std::convert::Infallible;
 use std::fs;
-use std::io::{BufRead, BufReader, BufWriter, Write};
+use std::hash::Hash;
+use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
 use std::str::FromStr;
 
+use crate::crash;
 use crate::file::File;
 
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Tag {
     pub name: String,
 }
@@ -31,7 +34,16 @@ impl Tag {
 
     pub fn add(&self, file: File) {
         let mut files = self.get_members();
-        files.insert(file);
+
+        if files.contains(&file) {
+            eprintln!(
+                "couldn't add '{}' to '{}': already tagged!",
+                file, self.name
+            );
+            return;
+        }
+
+        files.insert(file.clone());
 
         let out: String = files
             .iter()
@@ -42,13 +54,28 @@ impl Tag {
 
         let mut tagfile = fs::File::create(self.tagfile()).unwrap();
         tagfile.write_all(out.as_bytes()).unwrap();
+
+        println!("added '{}' to '{}'", file, self.name);
     }
 
     pub fn remove(&self, file: File) {
         let mut files = self.get_members();
-        files.remove(&file);
+        if files.is_empty() {
+            crash!("no such tag: '{}'", self.name)
+        }
 
-        if files.len() > 0 {
+        if !files.remove(&file) {
+            eprintln!(
+                "couldn't remove {} from {}: not in tag!",
+                file, self.name
+            );
+            return;
+        }
+
+        if files.is_empty() {
+            fs::remove_file(self.tagfile()).unwrap();
+        }
+        else {
             let out: String = files
                 .iter()
                 .map(|file| file.full_path())
@@ -59,9 +86,8 @@ impl Tag {
             let mut tagfile = fs::File::create(self.tagfile()).unwrap();
             tagfile.write_all(out.as_bytes()).unwrap();
         }
-        else {
-            fs::remove_file(self.tagfile()).unwrap();
-        }
+
+        println!("removed '{}' from '{}'", file, self.name);
     }
 
     /// Return the path to a tag's tagfile.
