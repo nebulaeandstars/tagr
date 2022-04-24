@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 dirs = "4.0"
+pathdiff = "0.2"
 
   [dependencies.clap]
   version = "3.1"

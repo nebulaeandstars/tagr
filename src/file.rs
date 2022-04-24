@@ -1,8 +1,8 @@
 use std::convert::Infallible;
+use std::fmt;
 use std::hash::Hash;
 use std::path::PathBuf;
 use std::str::FromStr;
-use std::{fmt, fs};
 
 use crate::crash;
 
@@ -16,6 +16,9 @@ impl File {
         if !self.path.exists() {
             crash!("file not found: {}", self)
         }
+        else if !self.path.is_file() {
+            crash!("path is not a file: {}", self)
+        }
     }
 
     pub fn relative_path(&self) -> &PathBuf {
@@ -23,7 +26,7 @@ impl File {
     }
 
     pub fn full_path(&self) -> PathBuf {
-        fs::canonicalize(&self.path).unwrap()
+        self.path.canonicalize().unwrap()
     }
 }
 
@@ -40,7 +43,7 @@ impl FromStr for File {
 impl fmt::Display for File {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let path = &self.relative_path().to_string_lossy();
-        write!(f, "'{}'", path)
+        write!(f, "{}", path)
     }
 }
 
@@ -48,6 +51,6 @@ impl fmt::Debug for File {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let full_path = self.full_path();
         let path = full_path.to_string_lossy();
-        write!(f, "'{}'", path)
+        write!(f, "{}", path)
     }
 }
