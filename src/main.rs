@@ -1,32 +1,20 @@
 mod cli;
+mod file;
 mod tag;
 
-use std::path::PathBuf;
-
 use cli::Command;
+use file::File;
 use tag::Tag;
 
-fn validate_files(files: &[PathBuf]) {
-    files.iter().for_each(|file| {
-        if !file.exists() {
-            crash!("{:?} does not exist!", file)
-        }
-    });
-}
-
-fn tag_files(tag: &Tag, files: &[PathBuf]) {
-    validate_files(files);
-
+fn tag_files(tag: &Tag, files: &[File]) {
     for file in files {
-        println!("adding to {}: {:?}", tag.name, file);
+        println!("adding to {}: {}", tag.name, file);
     }
 }
 
-fn untag_files(tag: &Tag, files: &[PathBuf]) {
-    validate_files(files);
-
+fn untag_files(tag: &Tag, files: &[File]) {
     for file in files {
-        println!("removing from {}: {:?}", tag.name, file);
+        println!("removing from {}: {}", tag.name, file);
     }
 }
 

@@ -1,7 +1,6 @@
-use std::path::PathBuf;
-
 use clap::{Parser, Subcommand};
 
+use crate::file::File;
 use crate::tag::Tag;
 
 #[derive(Parser)]
@@ -23,8 +22,7 @@ pub enum Command {
         tag: Tag,
 
         /// List of files to tag
-        #[clap(parse(from_os_str))]
-        files: Vec<PathBuf>,
+        files: Vec<File>,
     },
 
     /// Untag a set of files
@@ -33,8 +31,7 @@ pub enum Command {
         tag: Tag,
 
         /// List of files to untag
-        #[clap(parse(from_os_str))]
-        files: Vec<PathBuf>,
+        files: Vec<File>,
     },
 }
 
