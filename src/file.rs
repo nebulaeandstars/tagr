@@ -1,12 +1,10 @@
 use std::convert::Infallible;
-use std::fmt;
-use std::hash::Hash;
 use std::path::PathBuf;
 use std::str::FromStr;
+use std::{fmt, hash};
 
 use crate::crash;
 
-#[derive(Eq, PartialEq, Hash)]
 pub struct File {
     path: PathBuf,
 }
@@ -52,5 +50,21 @@ impl fmt::Debug for File {
         let full_path = self.full_path();
         let path = full_path.to_string_lossy();
         write!(f, "{}", path)
+    }
+}
+
+impl PartialEq for File {
+    fn eq(&self, other: &Self) -> bool {
+        self.full_path() == other.full_path()
+    }
+}
+impl Eq for File {}
+
+impl hash::Hash for File {
+    fn hash<H>(&self, state: &mut H)
+    where
+        H: hash::Hasher,
+    {
+        self.full_path().hash(state)
     }
 }

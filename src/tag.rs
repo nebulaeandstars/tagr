@@ -5,7 +5,6 @@ use std::io::{BufRead, BufReader, BufWriter, Write};
 use std::path::PathBuf;
 use std::str::FromStr;
 
-use crate::crash;
 use crate::file::File;
 
 pub struct Tag {
@@ -33,6 +32,21 @@ impl Tag {
     pub fn add(&self, file: File) {
         let mut files = self.get_members();
         files.insert(file);
+
+        let out: String = files
+            .iter()
+            .map(|file| file.full_path())
+            .fold(String::new(), |out, path| {
+                out + path.to_str().unwrap() + "\n"
+            });
+
+        let mut tagfile = fs::File::create(self.tagfile()).unwrap();
+        tagfile.write_all(out.as_bytes()).unwrap();
+    }
+
+    pub fn remove(&self, file: File) {
+        let mut files = self.get_members();
+        files.remove(&file);
 
         let out: String = files
             .iter()

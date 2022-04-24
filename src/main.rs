@@ -16,6 +16,7 @@ fn tag_files(tag: Tag, files: Vec<File>) {
 fn untag_files(tag: Tag, files: Vec<File>) {
     for file in files {
         println!("removing from {}: {}", tag.name, file);
+        tag.remove(file);
     }
 }
 
