@@ -21,13 +21,13 @@ fn untag_files(tag: Tag, files: Vec<File>) {
 fn list_tagged_files(tag: Tag) {
     let members = tag.get_members();
 
-    if members.len() > 0 {
+    if members.is_empty() {
+        crash!("no such tag: '{}'", tag.name)
+    }
+    else {
         for file in tag.get_members() {
             println!("{}", file);
         }
-    }
-    else {
-        crash!("no such tag: '{}'", tag.name)
     }
 }
 
