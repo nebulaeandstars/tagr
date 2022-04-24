@@ -33,6 +33,12 @@ pub enum Command {
         /// List of files to untag
         files: Vec<File>,
     },
+
+    /// List files under a given tag
+    Ls {
+        /// Tag to list files for
+        tag: Tag,
+    },
 }
 
 pub fn parse() -> Cli {

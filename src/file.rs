@@ -1,10 +1,12 @@
 use std::convert::Infallible;
+use std::hash::Hash;
 use std::path::PathBuf;
 use std::str::FromStr;
 use std::{fmt, fs};
 
 use crate::crash;
 
+#[derive(Eq, PartialEq, Hash)]
 pub struct File {
     path: PathBuf,
 }

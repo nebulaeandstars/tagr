@@ -1,12 +1,35 @@
+use std::collections::HashSet;
 use std::convert::Infallible;
+use std::fs;
+use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 use std::str::FromStr;
+
+use crate::crash;
+use crate::file::File;
 
 pub struct Tag {
     pub name: String,
 }
 
 impl Tag {
+    pub fn get_members(&self) -> HashSet<File> {
+        let tagfile = self.tagfile();
+        if tagfile.exists() {
+            let tagfile = fs::File::open(tagfile).unwrap();
+            let reader = BufReader::new(tagfile);
+            let lines = reader.lines();
+
+            lines
+                .into_iter()
+                .map(|line| File::from_str(&line.unwrap()).unwrap())
+                .collect()
+        }
+        else {
+            crash!("no such tag: '{}'", self.name)
+        }
+    }
+
     /// Return the path to a tag's tagfile.
     ///
     /// For example:
