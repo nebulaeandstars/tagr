@@ -2,6 +2,8 @@ use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
 
+use crate::tag::Tag;
+
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
 pub struct Cli {
@@ -10,7 +12,7 @@ pub struct Cli {
     pub verbosity: usize,
 
     #[clap(subcommand)]
-    pub command: Option<Command>,
+    pub command: Command,
 }
 
 #[derive(Subcommand)]
@@ -18,7 +20,7 @@ pub enum Command {
     /// Tag a set of files
     Tag {
         /// Tag to add the files to
-        tag: String,
+        tag: Tag,
 
         /// List of files to tag
         #[clap(parse(from_os_str))]
@@ -28,7 +30,7 @@ pub enum Command {
     /// Untag a set of files
     Untag {
         /// Tag to add the files to
-        tag: String,
+        tag: Tag,
 
         /// List of files to untag
         #[clap(parse(from_os_str))]

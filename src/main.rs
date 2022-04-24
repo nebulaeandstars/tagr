@@ -1,11 +1,12 @@
 mod cli;
+mod tag;
 
-use std::fs;
 use std::path::PathBuf;
 
 use cli::Command;
+use tag::Tag;
 
-fn validate_files<'a>(files: &'a [PathBuf]) -> Vec<&'a PathBuf> {
+fn validate_files(files: &[PathBuf]) -> Vec<&PathBuf> {
     files
         .iter()
         .inspect(|file| {
@@ -16,19 +17,21 @@ fn validate_files<'a>(files: &'a [PathBuf]) -> Vec<&'a PathBuf> {
         .collect()
 }
 
-fn tag_files(tag: &str, files: &[PathBuf]) {
+fn tag_files(tag: &Tag, files: &[PathBuf]) {
     let files = validate_files(files);
 
+    println!("{:?}", tag.tagfile);
+
     for file in files {
-        println!("adding {:?} to '{}'", file, tag);
+        println!("adding to {}: {:?}", tag.name, file);
     }
 }
 
-fn untag_files(tag: &str, files: &[PathBuf]) {
+fn untag_files(tag: &Tag, files: &[PathBuf]) {
     let files = validate_files(files);
 
     for file in files {
-        println!("removing {:?} from '{}'", file, tag);
+        println!("removing from {}: {:?}", tag.name, file);
     }
 }
 
@@ -36,8 +39,7 @@ fn main() {
     let cli = cli::parse();
 
     match &cli.command {
-        Some(Command::Tag { tag, files }) => tag_files(tag, files),
-        Some(Command::Untag { tag, files }) => untag_files(tag, files),
-        None => {},
+        Command::Tag { tag, files } => tag_files(tag, files),
+        Command::Untag { tag, files } => untag_files(tag, files),
     }
 }
