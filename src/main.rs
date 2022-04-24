@@ -1,49 +1,23 @@
+mod cli;
+
 use std::path::PathBuf;
 
-use clap::{Parser, Subcommand};
+use cli::Command;
 
-#[derive(Parser)]
-#[clap(author, version, about, long_about = None)]
-struct Cli {
-    /// Turn debugging information on
-    #[clap(short = 'v', long = "verbose", parse(from_occurrences))]
-    verbosity: usize,
-
-    #[clap(subcommand)]
-    command: Option<Command>,
+fn tag_files(tag: &str, files: &[PathBuf]) {
+    println!("adding {:?} to '{}'", files, tag);
 }
 
-#[derive(Subcommand)]
-enum Command {
-    /// Tag a set of files
-    Tag {
-        /// Tag to add the files to
-        tag: String,
-
-        /// List of files to tag
-        #[clap(parse(from_os_str))]
-        files: Vec<PathBuf>,
-    },
-
-    /// Untag a set of files
-    Untag {
-        /// Tag to add the files to
-        tag: String,
-
-        /// List of files to untag
-        #[clap(parse(from_os_str))]
-        files: Vec<PathBuf>,
-    },
+fn untag_files(tag: &str, files: &[PathBuf]) {
+    println!("removing {:?} from '{}'", files, tag);
 }
 
 fn main() {
-    let cli = Cli::parse();
+    let cli = cli::parse();
 
     match &cli.command {
-        Some(Command::Tag { files, tag }) =>
-            println!("adding {:?} to '{}'", files, tag),
-        Some(Command::Untag { files, tag }) =>
-            println!("removing {:?} from '{}'", files, tag),
+        Some(Command::Tag { tag, files }) => tag_files(tag, files),
+        Some(Command::Untag { tag, files }) => untag_files(tag, files),
         None => {},
     }
 }
