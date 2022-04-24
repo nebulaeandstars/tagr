@@ -15,6 +15,52 @@ pub struct Tag {
 }
 
 impl Tag {
+    pub fn add(&self, files: Vec<File>) {
+        let mut tagged_files = self.get_members();
+
+        for file in files {
+            if tagged_files.contains(&file) {
+                eprintln!(
+                    "couldn't add '{}' to '{}': already tagged!",
+                    file, self.name
+                );
+            }
+            else {
+                tagged_files.insert(file.clone());
+                println!("added '{}' to '{}'", file, self.name);
+            }
+        }
+
+        self.write_to_tagfile(tagged_files)
+    }
+
+    pub fn remove(&self, files: Vec<File>) {
+        let mut tagged_files = self.get_members();
+        if tagged_files.is_empty() {
+            crash!("no such tag: '{}'", self.name)
+        }
+
+        for file in files {
+            let removed = tagged_files.remove(&file);
+            if removed {
+                println!("removed '{}' from '{}'", file, self.name);
+            }
+            else {
+                eprintln!(
+                    "couldn't remove {} from {}: not in tag!",
+                    file, self.name
+                );
+            }
+        }
+
+        if tagged_files.is_empty() {
+            fs::remove_file(self.tagfile()).unwrap();
+        }
+        else {
+            self.write_to_tagfile(tagged_files);
+        }
+    }
+
     pub fn get_members(&self) -> HashSet<File> {
         let tagfile = self.tagfile();
         if tagfile.exists() {
@@ -32,62 +78,17 @@ impl Tag {
         }
     }
 
-    pub fn add(&self, file: File) {
-        let mut files = self.get_members();
+    pub fn list_members(&self) {
+        let members = self.get_members();
 
-        if files.contains(&file) {
-            eprintln!(
-                "couldn't add '{}' to '{}': already tagged!",
-                file, self.name
-            );
-            return;
-        }
-
-        files.insert(file.clone());
-
-        let out: String = files
-            .iter()
-            .map(|file| file.full_path())
-            .fold(String::new(), |out, path| {
-                out + path.to_str().unwrap() + "\n"
-            });
-
-        let mut tagfile = fs::File::create(self.tagfile()).unwrap();
-        tagfile.write_all(out.as_bytes()).unwrap();
-
-        println!("added '{}' to '{}'", file, self.name);
-    }
-
-    pub fn remove(&self, file: File) {
-        let mut files = self.get_members();
-        if files.is_empty() {
+        if members.is_empty() {
             crash!("no such tag: '{}'", self.name)
         }
-
-        if !files.remove(&file) {
-            eprintln!(
-                "couldn't remove {} from {}: not in tag!",
-                file, self.name
-            );
-            return;
-        }
-
-        if files.is_empty() {
-            fs::remove_file(self.tagfile()).unwrap();
-        }
         else {
-            let out: String = files
-                .iter()
-                .map(|file| file.full_path())
-                .fold(String::new(), |out, path| {
-                    out + path.to_str().unwrap() + "\n"
-                });
-
-            let mut tagfile = fs::File::create(self.tagfile()).unwrap();
-            tagfile.write_all(out.as_bytes()).unwrap();
+            for file in self.get_members() {
+                println!("{}", file);
+            }
         }
-
-        println!("removed '{}' from '{}'", file, self.name);
     }
 
     /// Return the path to a tag's tagfile.
@@ -109,6 +110,22 @@ impl Tag {
         path.push(&self.name);
         path.set_extension("tag");
         path
+    }
+
+    fn write_to_tagfile(&self, files: HashSet<File>) {
+        let out: String = files
+            .iter()
+            .map(|file| file.full_path())
+            .fold(String::new(), |out, path| {
+                out + path.to_str().unwrap() + "\n"
+            });
+
+        let tagfile = self.tagfile();
+        let parent = tagfile.parent().unwrap();
+        std::fs::create_dir_all(parent).unwrap();
+
+        let mut tagfile = fs::File::create(tagfile).unwrap();
+        tagfile.write_all(out.as_bytes()).unwrap();
     }
 }
 
