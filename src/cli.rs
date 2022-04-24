@@ -39,3 +39,16 @@ pub enum Command {
 pub fn parse() -> Cli {
     Cli::parse()
 }
+
+#[macro_export]
+macro_rules! crash {
+    ($str:literal) => {{
+        eprintln!($str);
+        std::process::exit(1);
+    }};
+
+    ($fmt_str:literal, $($args:expr),*) => {{
+        eprintln!($fmt_str, $($args),*);
+        std::process::exit(1);
+    }};
+}
