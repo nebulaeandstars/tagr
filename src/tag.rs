@@ -1,3 +1,4 @@
+use std::convert::Infallible;
 use std::path::PathBuf;
 use std::str::FromStr;
 
@@ -29,15 +30,15 @@ impl Tag {
 }
 
 impl FromStr for Tag {
-    type Err = String;
+    type Err = Infallible;
     fn from_str(name: &str) -> Result<Self, Self::Err> {
-        Ok(Self { name: name.to_string() })
+        Ok(Self::from(name))
     }
 }
 
 impl<S: AsRef<str>> From<S> for Tag {
     fn from(s: S) -> Self {
-        Self::from_str(s.as_ref()).unwrap()
+        Self { name: s.as_ref().to_string() }
     }
 }
 
