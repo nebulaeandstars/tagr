@@ -6,21 +6,16 @@ use std::path::PathBuf;
 use cli::Command;
 use tag::Tag;
 
-fn validate_files(files: &[PathBuf]) -> Vec<&PathBuf> {
-    files
-        .iter()
-        .inspect(|file| {
-            if !file.exists() {
-                crash!("{:?} does not exist!", file)
-            }
-        })
-        .collect()
+fn validate_files(files: &[PathBuf]) {
+    files.iter().for_each(|file| {
+        if !file.exists() {
+            crash!("{:?} does not exist!", file)
+        }
+    });
 }
 
 fn tag_files(tag: &Tag, files: &[PathBuf]) {
-    let files = validate_files(files);
-
-    println!("{:?}", tag.tagfile);
+    validate_files(files);
 
     for file in files {
         println!("adding to {}: {:?}", tag.name, file);
@@ -28,7 +23,7 @@ fn tag_files(tag: &Tag, files: &[PathBuf]) {
 }
 
 fn untag_files(tag: &Tag, files: &[PathBuf]) {
-    let files = validate_files(files);
+    validate_files(files);
 
     for file in files {
         println!("removing from {}: {:?}", tag.name, file);
